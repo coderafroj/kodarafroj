@@ -12,9 +12,3 @@ venv/
 *.jpg
 *.jpeg
 *.log
-Dockerfile
-.dockerignore
-test_api.py
-test_improvements.py
-# If you want to keep Dockerfile on GitHub, remove it from here. 
-# Usually Dockerfile IS kept on GitHub.
