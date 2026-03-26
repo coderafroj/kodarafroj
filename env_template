@@ -1,0 +1,7 @@
+MODEL_ID=runwayml/stable-diffusion-v1-5
+LCM_LORA_ID=latent-consistency/lcm-lora-sdv1-5
+DEVICE=auto
+DEFAULT_STEPS=4
+DEFAULT_GUIDANCE_SCALE=1.0
+LOG_LEVEL=INFO
+KODARAFROJ_STYLE=True
