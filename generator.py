@@ -52,7 +52,15 @@ class HinglishProcessor:
         # Action & Context
         "poster": "poster", "banner": "banner", "thumbnail": "thumbnail",
         "likho": "write", "dikhao": "show", "banao": "create", "karo": "do", "kijiye": "do",
-        "mere": "my", "tumhare": "your", "dikhao": "show", "le": "take", "lo": "take"
+        "mere": "my", "tumhare": "your", "dikhao": "show", "le": "take", "lo": "take",
+        
+        # New Additions for "ChatGPT-like" logic
+        "ghana": "dense", "andheri": "dark", "khula": "open", "maidan": "field",
+        "bachpan": "childhood", "budha": "old man", "jawan": "young", "khubsurat": "beautiful",
+        "shandar": "magnificent", "bhayanak": "terrifying", "sapna": "dream",
+        "pari": "fairy", "devta": "god", "rakshas": "demon", "talwar": "sword",
+        "taj": "crown", "rasta": "path", "manzil": "destination", "safar": "journey",
+        "barish": "rain", "badal": "cloud", "dhund": "fog", "thanda": "cold", "garam": "hot"
     }
 
     @classmethod
@@ -71,14 +79,18 @@ class StyleEngine:
         "sketch": {"p": "pencil sketch, hand-drawn, graphite texture, charcoal", "n": "colors, photography"},
         "3d": {"p": "3d render, octane render, unreal engine 5, soft lighting", "n": "2d, flat"},
         "retro": {"p": "vhs aesthetic, 80s style, grainy film, retro wave", "n": "modern, high def"},
-        "royal": {"p": "royal majestic style, elegant gold ornaments, luxury feel", "n": "cheap, messy"}
+        "royal": {"p": "royal majestic style, elegant gold ornaments, luxury feel", "n": "cheap, messy"},
+        "isometric": {"p": "isometric 3d view, low poly art, clean edges, tilt-shift", "n": "wide angle, fisheye"},
+        "oil": {"p": "classical oil painting, textured canvas, thick brushstrokes, masterwork", "n": "digital, smooth"},
+        "glass": {"p": "glassmorphism style, frosted glass textures, soft gradients, modern UI feel", "n": "rough, messy"}
     }
 
     MOODS = {
         "dark": "low key lighting, moody atmosphere, deep shadows, dark aesthetics",
         "happy": "bright sunny day, cheerful colors, high key lighting",
         "scary": "horror aesthetic, eerie lighting, misty fog, terrifying",
-        "magical": "fantasy glow, magical particles, ethereal lighting, dreamlike"
+        "magical": "fantasy glow, magical particles, ethereal lighting, dreamlike",
+        "epic": "grand scale, sweeping vistas, dramatic clouds, hero lighting"
     }
 
     @classmethod
@@ -176,6 +188,37 @@ class TextOverlay:
         
         return img.convert("RGB")
 
+class SmartDetailer:
+    """Intelligently adds subject-specific details to prompts."""
+    
+    SUBJECTS = {
+        "person": ["highly detailed facial features", "realistic skin pores", "sharp focus on eyes", "professional portrait lighting"],
+        "landscape": ["volumetric lighting", "atmospheric perspective", "intricate environment details", "wide field of view"],
+        "animal": ["detailed fur texture", "realistic eyes", "natural habitat background", "sharp focus"],
+        "city": ["sharp architecture lines", "detailed windows", "city lights", "structured composition"],
+        "fantasy": ["magical aura", "ethereal glow", "unreal details", "vivid imaginative colors"]
+    }
+
+    @classmethod
+    def get_details(cls, prompt: str) -> str:
+        p_low = prompt.lower()
+        details = []
+        
+        # Detection logic
+        if any(x in p_low for x in ["man", "woman", "boy", "girl", "person", "human", "face"]):
+            details.extend(cls.SUBJECTS["person"])
+        elif any(x in p_low for x in ["lion", "cat", "dog", "horse", "tiger", "animal", "bird"]):
+            details.extend(cls.SUBJECTS["animal"])
+        elif any(x in p_low for x in ["forest", "mountain", "river", "ocean", "landscape", "pahaad", "jungle"]):
+            details.extend(cls.SUBJECTS["landscape"])
+        elif any(x in p_low for x in ["city", "shahar", "mahal", "palace", "building"]):
+            details.extend(cls.SUBJECTS["city"])
+        
+        if any(x in p_low for x in ["magic", "jaadu", "dream", "sapna", "fairy"]):
+            details.extend(cls.SUBJECTS["fantasy"])
+            
+        return ", ".join(details)
+
 class PromptMaster:
     """Enhances user prompts with AI-level understanding and premium styling."""
     
@@ -223,7 +266,11 @@ class PromptMaster:
         
         # 5. Build final prompt
         mods = cls.POSTER_MODIFIERS if is_poster else cls.BASE_MODIFIERS
-        final_prompt = f"{cleaned}, {style_p}, {', '.join(mods)}"
+        
+        # 6. Add Smart Details
+        smart_details = SmartDetailer.get_details(cleaned)
+        
+        final_prompt = f"{cleaned}, {style_p}, {smart_details}, {', '.join(mods)}"
         
         return final_prompt.replace(", ,", ",").strip(", "), cls.get_negative(style_n)
 
