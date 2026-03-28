@@ -2,7 +2,7 @@ torch
 diffusers
 transformers
 accelerate
-PIL
+Pillow
 FastAPI
 uvicorn
 requests
