@@ -10,6 +10,11 @@ import re
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger("KodarafrojGenerator")
 
+# Suppress noisy external loggers
+logging.getLogger("httpx").setLevel(logging.WARNING)
+logging.getLogger("huggingface_hub").setLevel(logging.ERROR)
+logging.getLogger("huggingface_hub.utils._http").setLevel(logging.ERROR)
+
 load_dotenv()
 
 class HinglishProcessor:
